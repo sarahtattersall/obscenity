@@ -11,21 +11,24 @@ class TestConfig < Test::Unit::TestCase
       end
     end
   end
-  
+
   should "properly set the config parameters" do
     blacklist   = ['ass', 'shit', 'penis']
     whitelist   = ['penis']
     replacement = :stars
-    
+    partial = true
+
     config = Obscenity::Config.new do |config|
       config.blacklist   = blacklist
       config.whitelist   = whitelist
       config.replacement = replacement
+      config.partial     = partial
     end
-    
+
     assert_equal blacklist, config.blacklist
     assert_equal whitelist, config.whitelist
     assert_equal replacement, config.replacement
+    assert_equal partial, config.partial
   end
 
   should "return default values if none is set" do
@@ -33,6 +36,7 @@ class TestConfig < Test::Unit::TestCase
     assert_equal [], config.whitelist
     assert_equal :garbled, config.replacement
     assert_match /config\/blacklist.yml/, config.blacklist
+    assert_equal false, config.partial
   end
 
   should "return default values when default values are set" do
@@ -42,16 +46,17 @@ class TestConfig < Test::Unit::TestCase
     end
     assert_equal [], config.whitelist
     assert_equal :default, config.replacement
+    assert_equal false, config.partial
     assert_match /config\/blacklist.yml/, config.blacklist
   end
-  
+
   should "properly validate the config options" do
     [:blacklist, :whitelist].each do |field|
       exceptions = [
-        [Obscenity::UnkownContent, {}], 
-        [Obscenity::UnkownContent, ":unkown"], 
-        [Obscenity::EmptyContentList, []], 
-        [Obscenity::UnkownContentFile, "'path/to/file'"], 
+        [Obscenity::UnkownContent, {}],
+        [Obscenity::UnkownContent, ":unkown"],
+        [Obscenity::EmptyContentList, []],
+        [Obscenity::UnkownContentFile, "'path/to/file'"],
         [Obscenity::UnkownContentFile, Pathname.new("'path/to/file'")]
       ].each do |klass, value|
         assert_raise(klass){
@@ -62,5 +67,5 @@ class TestConfig < Test::Unit::TestCase
       end
     end
   end
-  
+
 end

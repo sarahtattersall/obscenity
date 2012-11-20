@@ -4,7 +4,8 @@ class TestBase < Test::Unit::TestCase
 
   context "#respond_to?" do
     should "respond to methods and attributes" do
-      [:blacklist, :whitelist, :profane?, :sanitize, :replacement, :offensive, :replace].each do |field|
+      [:blacklist, :whitelist, :profane?, :sanitize, :replacement, :offensive,
+          :replace, :partial].each do |field|
         assert Obscenity::Base.respond_to?(field)
       end
     end
@@ -25,7 +26,7 @@ class TestBase < Test::Unit::TestCase
       end
     end
   end
-  
+
   context "#whitelist" do
     context "without custom config" do
       setup { Obscenity::Base.whitelist = :default }
@@ -41,18 +42,33 @@ class TestBase < Test::Unit::TestCase
       end
     end
   end
-  
+
   context "#profane?" do
     context "without whitelist" do
       context "without custom config" do
-        setup { 
-          Obscenity::Base.blacklist = :default
-          Obscenity::Base.whitelist = :default
-        }
-        should "validate the profanity of a word based on the default list" do
-          assert Obscenity::Base.profane?('ass')
-          assert Obscenity::Base.profane?('biatch')
-          assert !Obscenity::Base.profane?('hello')
+        context "with partial profanity filtering" do
+          setup {
+            Obscenity::Base.blacklist = :default
+            Obscenity::Base.whitelist = :default
+            Obscenity::Base.partial   = true
+          }
+          should "validate the profanity of a word based on the default list" do
+            assert Obscenity::Base.profane?('ass')
+            assert Obscenity::Base.profane?('biatch')
+            assert Obscenity::Base.profane?('hello')
+          end
+        end
+        context "without partial profanity filtering" do
+          setup {
+            Obscenity::Base.blacklist = :default
+            Obscenity::Base.whitelist = :default
+            Obscenity::Base.partial   = false
+          }
+          should "validate the profanity of a word based on the default list" do
+            assert Obscenity::Base.profane?('ass')
+            assert Obscenity::Base.profane?('biatch')
+            assert !Obscenity::Base.profane?('hello')
+          end
         end
       end
       context "with custom blacklist config" do
@@ -66,7 +82,7 @@ class TestBase < Test::Unit::TestCase
     end
     context "with whitelist" do
       context "without custom blacklist config" do
-        setup { 
+        setup {
           Obscenity::Base.blacklist = :default
           Obscenity::Base.whitelist = ['biatch']
         }
@@ -77,7 +93,7 @@ class TestBase < Test::Unit::TestCase
         end
       end
       context "with custom blacklist/whitelist config" do
-        setup { 
+        setup {
           Obscenity::Base.blacklist = ['ass', 'word']
           Obscenity::Base.whitelist = ['word']
         }
@@ -89,11 +105,11 @@ class TestBase < Test::Unit::TestCase
       end
     end
   end
-  
+
   context "#sanitize" do
     context "without whitelist" do
       context "without custom config" do
-        setup { 
+        setup {
           Obscenity::Base.blacklist = :default
           Obscenity::Base.whitelist = :default
         }
@@ -112,7 +128,7 @@ class TestBase < Test::Unit::TestCase
     end
     context "with whitelist" do
       context "without custom blacklist config" do
-        setup { 
+        setup {
           Obscenity::Base.blacklist = :default
           Obscenity::Base.whitelist = ['biatch']
         }
@@ -122,7 +138,7 @@ class TestBase < Test::Unit::TestCase
         end
       end
       context "with custom blacklist/whitelist config" do
-        setup { 
+        setup {
           Obscenity::Base.blacklist = ['clown', 'biatch']
           Obscenity::Base.whitelist = ['biatch']
         }
@@ -133,11 +149,11 @@ class TestBase < Test::Unit::TestCase
       end
     end
   end
-  
+
   context "#replacement" do
     context "without whitelist" do
       context "without custom config" do
-        setup { 
+        setup {
           Obscenity::Base.blacklist = :default
           Obscenity::Base.whitelist = :default
         }
@@ -162,7 +178,7 @@ class TestBase < Test::Unit::TestCase
     end
     context "with whitelist" do
       context "without custom blacklist config" do
-        setup { 
+        setup {
           Obscenity::Base.blacklist = :default
           Obscenity::Base.whitelist = ['biatch']
         }
@@ -175,7 +191,7 @@ class TestBase < Test::Unit::TestCase
         end
       end
       context "with custom blacklist/whitelist config" do
-        setup { 
+        setup {
           Obscenity::Base.blacklist = ['clown', 'biatch']
           Obscenity::Base.whitelist = ['biatch']
         }
@@ -190,11 +206,11 @@ class TestBase < Test::Unit::TestCase
       end
     end
   end
-  
+
   context "#offensive" do
     context "without whitelist" do
       context "without custom config" do
-        setup { 
+        setup {
           Obscenity::Base.blacklist = :default
           Obscenity::Base.whitelist = :default
         }
@@ -213,7 +229,7 @@ class TestBase < Test::Unit::TestCase
     end
     context "with whitelist" do
       context "without custom blacklist config" do
-        setup { 
+        setup {
           Obscenity::Base.blacklist = :default
           Obscenity::Base.whitelist = ['biatch']
         }
@@ -223,7 +239,7 @@ class TestBase < Test::Unit::TestCase
         end
       end
       context "with custom blacklist/whitelist config" do
-        setup { 
+        setup {
           Obscenity::Base.blacklist = ['clown', 'biatch']
           Obscenity::Base.whitelist = ['biatch']
         }
@@ -234,7 +250,7 @@ class TestBase < Test::Unit::TestCase
       end
     end
   end
-  
+
   context "#replace" do
     should "replace the given word by the given replacement method" do
       [
@@ -249,5 +265,5 @@ class TestBase < Test::Unit::TestCase
       end
     end
   end
-  
+
 end

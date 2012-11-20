@@ -1,7 +1,7 @@
 require 'helper'
 
 class TestActiveModel < Test::Unit::TestCase
-  
+
   def generate_new_class(name, options = {})
     Dummy.send(:remove_const, name) if Dummy.const_defined?(name)
     klass = Class.new(Dummy::BaseModel) do
@@ -16,6 +16,21 @@ class TestActiveModel < Test::Unit::TestCase
     assert !post.valid?
     assert post.errors.has_key?(:title)
     assert_equal ['cannot be profane'], post.errors[:title]
+  end
+
+  should "be invalid when title is partially profane" do
+    klass = generate_new_class("Post", obscenity: { partial: true })
+    post = klass.new(title: "fucktitshit")
+    assert !post.valid?
+    assert post.errors.has_key?(:title)
+    assert_equal ['cannot be profane'], post.errors[:title]
+  end
+
+  should "be valid when title is not partially profane" do
+    klass = generate_new_class("Post", obscenity: { partial: false })
+    post = klass.new(title: "fucktitshit")
+    assert post.valid?
+    assert !post.errors.has_key?(:title)
   end
 
   should "be invalid when title is profane and should include a custom error message" do
@@ -33,7 +48,7 @@ class TestActiveModel < Test::Unit::TestCase
     assert !post.errors.has_key?(:title)
     assert_equal "He who poops, $@!#% itself", post.title
   end
-  
+
   should "sanitize the title using the :garbled replacement" do
     klass = generate_new_class("Post", obscenity: { sanitize: true, replacement: :garbled })
     post  = klass.new(title: "He who poops, shits itself")
