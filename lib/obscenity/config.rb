@@ -1,41 +1,49 @@
 module Obscenity
   class Config
-    
-    attr_accessor :replacement
-    
+
+    attr_accessor :replacement, :partial
+
     DEFAULT_WHITELIST = []
     DEFAULT_BLACKLIST = File.dirname(__FILE__) + "/../../config/blacklist.yml"
-    
+
     def initialize
       yield(self) if block_given?
       validate_config_options
     end
-    
+
     def replacement
       @replacement ||= :garbled
     end
-    
+
     def blacklist
       @blacklist ||= DEFAULT_BLACKLIST
     end
-    
+
     def blacklist=(value)
       @blacklist = value == :default ? DEFAULT_BLACKLIST : value
     end
-    
+
     def whitelist
       @whitelist ||= DEFAULT_WHITELIST
     end
-    
+
     def whitelist=(value)
       @whitelist = value == :default ? DEFAULT_WHITELIST : value
     end
-    
+
+    def partial
+      @partial ||= false
+    end
+
+    def partial=(bool)
+      @partial = bool
+    end
+
     private
     def validate_config_options
       [@blacklist, @whitelist].each{ |content| validate_list_content(content) if content }
     end
-    
+
     def validate_list_content(content)
       case content
       when Array    then !content.empty?       || raise(Obscenity::EmptyContentList.new('Content array is empty.'))
@@ -46,6 +54,6 @@ module Obscenity
         raise Obscenity::UnkownContent.new("The content can be either an Array, Pathname, or String path to a .yml file.")
       end
     end
-    
+
   end
 end
