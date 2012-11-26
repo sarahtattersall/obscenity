@@ -20,7 +20,7 @@ Jeweler::Tasks.new do |gem|
   # gem is a Gem::Specification... see http://docs.rubygems.org/read/chapter/20 for more options
   gem.name          = "obscenity"
   gem.version       = Obscenity::VERSION
-  gem.authors       = ["Thiago Jackiw"]
+  gem.authors       = ["Thiago Jackiw", "Sarah Tattersall"]
   gem.email         = "tjackiw@gmail.com"
   gem.homepage      = "http://github.com/tjackiw/obscenity"
   gem.license       = "MIT"
