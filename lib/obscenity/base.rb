@@ -28,15 +28,23 @@ module Obscenity
       end
 
       def profane?(text, partial=false)
-        return(false) unless text.to_s.size >= 3
+        return(false) unless text.to_s.size >= 2
         blacklist.each do |foul|
           if partial || @partial || Obscenity.config.partial
-            return(true) if text =~ /#{foul}/i &&!whitelist.include?(foul)
+            return (true) if process_partial foul, text
           else
             return(true) if text =~ /\b#{foul}\b/i && !whitelist.include?(foul)
           end
         end
         false
+      end
+
+      def process_partial(foul, text)
+        if foul.size <= 3 && text.size > foul.size
+          return false
+        end
+        return(true) if text =~ /#{foul}/i &&!whitelist.include?(foul)
+        return false
       end
 
       def sanitize(text)

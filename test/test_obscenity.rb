@@ -39,6 +39,13 @@ class TestObscenity < Test::Unit::TestCase
       assert Obscenity.profane?('Yo, check that ass out', true)
       assert Obscenity.profane?('Hello world', true)
     end
+
+    should "ensure partial matching does not apply for fouls <= 3 in size unless they're just the foul" do
+      assert Obscenity.profane?('ho', true)
+      assert !Obscenity.profane?('python', true)
+      assert Obscenity.profane?('hell', true)
+      assert Obscenity.profane?('hello', true)
+    end
   end
 
   # More comprehensive test in test_base.rb
